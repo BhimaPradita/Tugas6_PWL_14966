@@ -113,6 +113,36 @@ $(document).ready(function() {
         minimumInputLength: 3
     });
 
+    $("#kelurahan").on('change', function() {
+        var id_kelurahan = $(this).val(); 
+        $("#layanan").empty();
+        ongkir = 0;
+
+        $.ajax({
+            url: "<?= site_url('get-cost') ?>",
+            type: 'GET',
+            data: { 
+                'destination': id_kelurahan, 
+            },
+            dataType: 'json',
+            success: function(data) { 
+                data.forEach(function(item) {
+                    var text = item["description"] + " (" + item["service"] + ") : estimasi " + item["etd"] + "";
+                    $("#layanan").append($('<option>', {
+                        value: item["cost"],
+                        text: text 
+                    }));
+                });
+                hitungTotal(); 
+            },
+        });
+    });
+
+    $("#layanan").on('change', function() {
+        ongkir = parseInt($(this).val());
+        hitungTotal();
+    });  
+
     function hitungTotal() {
         total = ongkir + <?= $total ?>;
 

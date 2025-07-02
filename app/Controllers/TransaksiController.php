@@ -14,7 +14,12 @@ class TransaksiController extends BaseController
         helper('form');
         $this->cart = \Config\Services::cart();
         $this->client = new \GuzzleHttp\Client();
-        $this->apiKey = env('COST_KEY');
+        $this->apiKey = getenv('COST_KEY');
+
+        if (!$this->apiKey) {
+            throw new \Exception("API KEY Raja Ongkir tidak ditemukan di .env (COST_KEY)");
+        }
+
     }
 
     public function index()
@@ -22,6 +27,13 @@ class TransaksiController extends BaseController
         $data['items'] = $this->cart->contents();
         $data['total'] = $this->cart->total();
         return view('v_keranjang', $data);
+    }
+
+    public function cekKey()
+    {
+        return $this->response->setJSON([
+            'apiKey' => $this->apiKey
+        ]);
     }
 
     public function cart_add()
@@ -75,21 +87,39 @@ class TransaksiController extends BaseController
 
     public function getLocation()
     {
-            //keyword pencarian yang dikirimkan dari halaman checkout
-        $search = $this->request->getGet('search');
+        try {
+            // Ambil keyword dari URL
+            $search = $this->request->getGet('search');
 
-        $response = $this->client->request(
-            'GET', 
-            'https://rajaongkir.komerce.id/api/v1/destination/domestic-destination?search='.$search.'&limit=50', [
-                'headers' => [
-                    'accept' => 'application/json',
-                    'key' => $this->apiKey,
-                ],
-            ]
-        );
+            // Lakukan request ke API Raja Ongkir
+            $response = $this->client->request(
+                'GET', 
+                'https://rajaongkir.komerce.id/api/v1/destination/domestic-destination?search=' . $search . '&limit=50', 
+                [
+                    'headers' => [
+                        'accept' => 'application/json',
+                        'key' => $this->apiKey,
+                    ],
+                ]
+            );
 
-        $body = json_decode($response->getBody(), true); 
-        return $this->response->setJSON($body['data']);
+            // Decode responsenya
+            $body = json_decode($response->getBody(), true);
+
+            // Validasi hasil response
+            if (isset($body['data']) && is_array($body['data'])) {
+                return $this->response->setJSON($body['data']);
+            } else {
+                return $this->response->setStatusCode(500)->setJSON([
+                    'error' => 'Response tidak sesuai atau tidak ada data.'
+                ]);
+            }
+        } catch (\Throwable $e) {
+            // Tangani jika terjadi error jaringan, parsing, dll
+            return $this->response->setStatusCode(500)->setJSON([
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     public function getCost()

@@ -40,3 +40,6 @@ $routes->get('produk', 'ProdukController::index', ['filter' => 'auth']);
 $routes->get('keranjang', 'TransaksiController::index', ['filter' => 'auth']);
 $routes->get('contact', 'Home::contact', ['filter' => 'auth']);
 
+$routes->get('profile', 'Home::profile', ['filter' => 'auth']);
+
+$routes->resource('api', ['controller' => 'apiController']);

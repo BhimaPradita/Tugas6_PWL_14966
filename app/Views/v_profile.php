@@ -1,5 +1,7 @@
+<?php helper('number'); ?>
 <?= $this->extend('layout') ?>
 <?= $this->section('content') ?>
+
 History Transaksi Pembelian <strong><?= $username ?></strong>
 <hr>
 <div class="table-responsive">

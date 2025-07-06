@@ -38,7 +38,7 @@
         ?>
 
         <li class="nav-item">
-            <a class="nav-link <?php echo (uri_string() == 'profile') ? "" : "collapsed" ?>" href="profile">
+            <a class="nav-link <?= (uri_string() == 'profile') ? '' : 'collapsed' ?>" href="<?= base_url('profile') ?>">
                 <i class="bi bi-person"></i>
                 <span>Profile</span>
             </a>

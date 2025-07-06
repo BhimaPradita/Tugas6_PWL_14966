@@ -2,61 +2,62 @@
 
 namespace App\Controllers;
 
-use App\Models\ProductModel; 
-use App\Models\TransactionModel;
-use App\Models\TransactionDetailModel;
+use App\Models\ProductModel;
+use Config\Services;
 
 class Home extends BaseController
 {
-    public function contact(): string
-    {
-        return view('v_contact');
-    }
-
     protected $product;
-    protected $transaction;
-    protected $transaction_detail;
 
     public function __construct()
     {
-        helper("form");
-        helper("number");
+        helper(['form', 'number']);
         $this->product = new ProductModel();
-        $this->transaction = new TransactionModel();
-        $this->transaction_detail = new TransactionDetailModel();
     }
 
     public function index()
     {
         $product = $this->product->findAll();
 
-        $data['product'] = $product;
+        // Cek diskon dari session
+        $diskon = session()->get('diskon_hari_ini') ?? 0;
 
-        return view('v_home', $data);
-    }
-
-    public function profile()
-    {
-        $username = session()->get('username');
-        $data['username'] = $username;
-
-        $buy = $this->transaction->where('username', $username)->findAll();
-        $data['buy'] = $buy;
-
-        $product = [];
-
-        if (!empty($buy)) {
-            foreach ($buy as $item) {
-                $detail = $this->transaction_detail->select('transaction_detail.*, product.nama, product.harga, product.foto')->join('product', 'transaction_detail.product_id=product.id')->where('transaction_id', $item['id'])->findAll();
-
-                if (!empty($detail)) {
-                    $product[$item['id']] = $detail;
-                }
-            }
+        // Hitung harga setelah diskon
+        foreach ($product as &$item) {
+            $item['harga_awal'] = $item['harga'];
+            $item['harga_diskon'] = max(0, $item['harga'] - $diskon);
         }
 
-        $data['product'] = $product;
+        return view('v_home', [
+            'product' => $product,
+            'diskon' => $diskon
+        ]);
+    }
 
-        return view('v_profile', $data);
+    public function beli()
+    {
+        $request = service('request');
+        $session = session();
+
+        $id = $request->getPost('id');
+        $nama = $request->getPost('nama');
+        $harga = (int)$request->getPost('harga');
+        $foto = $request->getPost('foto');
+        $harga_awal = (int)$request->getPost('harga_awal');
+
+        $cart = $session->get('cart') ?? [];
+
+        // Tambahkan item ke cart
+        $cart[] = [
+            'id' => $id,
+            'nama' => $nama,
+            'qty' => 1,
+            'harga' => $harga,
+            'harga_awal' => $harga_awal,
+            'foto' => $foto,
+        ];
+
+        $session->set('cart', $cart);
+        return redirect()->to('/keranjang')->with('success', 'Produk berhasil ditambahkan ke keranjang');
     }
 }

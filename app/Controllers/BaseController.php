@@ -21,15 +21,15 @@ abstract class BaseController extends Controller
     {
         parent::initController($request, $response, $logger);
 
-        // ✅ Ambil diskon hari ini dari database jika belum diset
-        if (!session()->has('diskon_hari_ini')) {
-            $diskonModel = new DiskonModel();
-            $hariIni = date('Y-m-d');
+        // Cek apakah ada diskon untuk hari ini di database
+        $diskonModel = new \App\Models\DiskonModel();
+        $hariIni = date('Y-m-d');
+        $diskonHariIni = $diskonModel->where('tanggal', $hariIni)->first();
 
-            $diskon = $diskonModel->where('tanggal', $hariIni)->first();
-            if ($diskon) {
-                session()->set('diskon_hari_ini', $diskon['nominal']);
-            }
+        if ($diskonHariIni) {
+            session()->set('diskon_hari_ini', $diskonHariIni['nominal']);
+        } else {
+            session()->remove('diskon_hari_ini');
         }
     }
 }

@@ -2,18 +2,20 @@
 <?= $this->section('content') ?>
 
 <div class="container mt-4">
-    <!-- Tampilkan Flashdata -->
     <?php if (session()->getFlashdata('error')) : ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <?= session()->getFlashdata('error') ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
+
     <?php if (session()->getFlashdata('success')) : ?>
-        <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?= session()->getFlashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     <?php endif; ?>
 
-    <!-- Tombol Tambah Diskon -->
     <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addModal">
         Tambah Diskon
     </button>
@@ -45,7 +47,6 @@
             </form>
         </div>
     </div>
-    <!-- End Modal -->
 
     <!-- Tabel Diskon -->
     <table class="table table-bordered">
@@ -68,9 +69,6 @@
             <?php endforeach ?>
         </tbody>
     </table>
-
-
-
 
 </div>
 

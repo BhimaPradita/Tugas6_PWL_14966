@@ -36,26 +36,16 @@ if (uri_string() != "") {
 
   <!-- Template Main CSS File -->
   <link href="<?= base_url() ?>NiceAdmin/assets/css/style.css" rel="stylesheet">
-
-  <style>
-    body {
-      padding-top: 100px; /* Tambahkan padding agar konten tidak tertutup header + alert */
-    }
-
-    .alert-diskon {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1090;
-    }
-  </style>
 </head>
 
 <body>
 
   <!-- Diskon Hari Ini -->
-  
+  <?php if (session()->has('diskon_hari_ini')) : ?>
+    <div class="alert alert-success text-center mb-0 py-2" style="border-radius: 0;">
+      <strong>Hari ini ada diskon <?= number_format(session('diskon_hari_ini'), 0, ',', '.') ?> per item</strong>
+    </div>
+  <?php endif; ?>
   <!-- End Diskon -->
 
   <?= $this->include('components/header') ?>

@@ -43,3 +43,10 @@ $routes->get('contact', 'Home::contact', ['filter' => 'auth']);
 $routes->get('profile', 'Home::profile', ['filter' => 'auth']);
 
 $routes->resource('api', ['controller' => 'apiController']);
+
+
+$routes->get('diskon', 'DiskonController::index');
+$routes->post('diskon/simpan', 'DiskonController::simpan');
+$routes->post('diskon/update/(:num)', 'DiskonController::update/$1');
+$routes->get('diskon/delete/(:num)', 'DiskonController::delete/$1');
+

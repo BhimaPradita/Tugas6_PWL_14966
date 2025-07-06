@@ -1,5 +1,6 @@
 <?= $this->extend('layout') ?>
 <?= $this->section('content') ?>
+
 <?php
 if (session()->getFlashData('success')) {
 ?>
